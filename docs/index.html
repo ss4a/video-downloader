@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Video Downloader: free video downloader for Windows</title>
+  <meta name="description" content="Paste a video link, preview it, and download it as MP4 in one click. Free for Windows 10 and 11. No ads, no account, nothing else to install.">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0a0b10">
+  <link rel="icon" type="image/png" href="img/favicon.png">
+  <link rel="apple-touch-icon" href="img/icon-180.png">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Video Downloader: free for Windows">
+  <meta property="og:description" content="Paste a link, preview it, and download it in one click. No ads, no account, nothing else to install.">
+  <meta property="og:image" content="https://ss4a.github.io/video-downloader/img/og.png">
+  <meta property="og:url" content="https://ss4a.github.io/video-downloader/">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="glow" aria-hidden="true"></div>
+
+  <header class="nav">
+    <a class="brand" href="./">
+      <img src="img/favicon.png" alt="" width="30" height="30">
+      Video Downloader
+    </a>
+    <nav class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#faq">FAQ</a>
+      <a href="https://github.com/ss4a/video-downloader" class="nav-gh">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        <span>GitHub</span>
+      </a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Hero ---------------------------------------------------------------->
+    <section class="hero wrap">
+      <div class="hero-copy">
+        <p class="eyebrow">Free for Windows 10 &amp; 11</p>
+        <h1>Download videos.<br><span>Skip the clutter.</span></h1>
+        <p class="lede">Paste a link, check the preview, and confirm. Video Downloader saves the best-quality MP4 to your Downloads folder. There are no ads, you don't need an account, and there's nothing else to install.</p>
+        <div class="cta">
+          <a class="btn btn-primary btn-lg" id="dl-main" href="https://github.com/ss4a/video-downloader/releases/latest/download/VideoDownloader_Setup.exe">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M6 19.5h12"/></svg>
+            Download for Windows
+          </a>
+          <a class="btn btn-ghost btn-lg" href="https://github.com/ss4a/video-downloader/releases/latest/download/VideoDownloader_Portable.exe">Portable version</a>
+        </div>
+        <p class="meta">v1.0.0 · 96 MB installer · 64-bit</p>
+        <p class="os-note" id="os-note" hidden>Video Downloader runs on Windows. You can still download it here and copy it to a Windows PC.</p>
+      </div>
+
+      <figure class="hero-shot">
+        <div class="window">
+          <div class="window-bar" aria-hidden="true">
+            <img src="img/favicon.png" alt="" width="14" height="14"> Video Downloader
+            <span class="window-ctrls"><i></i><i></i><i></i></span>
+          </div>
+          <img src="img/confirm.webp" width="1600" height="1242"
+               alt="The Video Downloader confirmation screen showing Big Buck Bunny, with Cancel and Confirm &amp; Download buttons">
+        </div>
+      </figure>
+    </section>
+
+    <!-- How it works -------------------------------------------------------->
+    <section class="section wrap" id="how">
+      <h2 class="section-title">Three steps. That's it.</h2>
+      <p class="section-sub">Nothing downloads until you've seen exactly what you're getting.</p>
+
+      <ol class="steps">
+        <li class="step">
+          <div class="step-copy">
+            <span class="step-num">1</span>
+            <h3>Paste a link</h3>
+            <p>Copy a link from YouTube, Vimeo, or <a href="https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md">hundreds of other sites</a>, paste it in, and click <strong>Fetch Video</strong>.</p>
+          </div>
+          <div class="step-shot"><img src="img/home.webp" width="1600" height="864" loading="lazy" alt="Home screen with a link pasted into the input and a Fetch Video button"></div>
+        </li>
+        <li class="step">
+          <div class="step-copy">
+            <span class="step-num">2</span>
+            <h3>Check the preview</h3>
+            <p>See the thumbnail, title, channel, length, best quality, and approximate size, so you know it's the right video before saving anything.</p>
+          </div>
+          <div class="step-shot step-shot-tall"><img src="img/preview.webp" width="1600" height="2000" loading="lazy" alt="Preview screen with thumbnail, title, channel, duration, views, quality and size"></div>
+        </li>
+        <li class="step">
+          <div class="step-copy">
+            <span class="step-num">3</span>
+            <h3>Confirm &amp; download</h3>
+            <p>Click <strong>Confirm &amp; Download</strong> and watch the progress bar. When it's done, <strong>Show in folder</strong> takes you straight to the file.</p>
+          </div>
+          <div class="step-shot step-stack">
+            <img src="img/progress.webp" width="1600" height="840" loading="lazy" alt="Download in progress at 42 percent with speed and time remaining">
+            <img src="img/done.webp" width="1600" height="1014" loading="lazy" alt="Download complete with a Show in folder button">
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- Features ------------------------------------------------------------>
+    <section class="section wrap">
+      <h2 class="section-title">Small app, no surprises</h2>
+      <div class="features">
+        <article class="feature">
+          <div class="f-icon"><svg viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5zM3 8l9 5 9-5M12 13v8"/></svg></div>
+          <h3>Nothing else to install</h3>
+          <p>Everything it needs is built in. No Python, no FFmpeg, no browser extensions.</p>
+        </article>
+        <article class="feature">
+          <div class="f-icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3z"/></svg></div>
+          <h3>Best quality, plays anywhere</h3>
+          <p>It picks the best available video and audio and merges them into a standard MP4.</p>
+        </article>
+        <article class="feature">
+          <div class="f-icon"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></div>
+          <h3>You're in control</h3>
+          <p>You see a preview and confirm before anything downloads, so you won't get surprise files.</p>
+        </article>
+        <article class="feature">
+          <div class="f-icon"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+          <h3>Private by design</h3>
+          <p>It runs entirely on your PC. You don't need an account, and there's no tracking and no ads.</p>
+        </article>
+        <article class="feature">
+          <div class="f-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></div>
+          <h3>Hundreds of sites</h3>
+          <p>It's powered by <a href="https://github.com/yt-dlp/yt-dlp">yt-dlp</a>, the open-source engine trusted by millions.</p>
+        </article>
+        <article class="feature">
+          <div class="f-icon"><svg viewBox="0 0 24 24"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></svg></div>
+          <h3>Free &amp; open source</h3>
+          <p>Read every line on <a href="https://github.com/ss4a/video-downloader">GitHub</a>. Uninstalling never deletes your videos.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- Install ------------------------------------------------------------->
+    <section class="section wrap install">
+      <div class="install-card">
+        <div>
+          <h2 class="section-title left">Install in a minute</h2>
+          <ol class="install-steps">
+            <li>Download <strong>VideoDownloader_Setup.exe</strong> and double-click it.</li>
+            <li>Choose <strong>Install for me only</strong>. It doesn't need admin rights.</li>
+            <li>Click through the wizard and leave <strong>Launch Video Downloader</strong> ticked.</li>
+          </ol>
+          <div class="callout">
+            <strong>Seeing "Windows protected your PC"?</strong>
+            This appears because the app is new and not code-signed. Click <em>More info</em>, then <em>Run anyway</em>.
+          </div>
+        </div>
+        <div class="install-cta">
+          <a class="btn btn-primary btn-lg" href="https://github.com/ss4a/video-downloader/releases/latest/download/VideoDownloader_Setup.exe">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M6 19.5h12"/></svg>
+            Download for Windows
+          </a>
+          <dl class="specs">
+            <div><dt>Version</dt><dd>1.0.0</dd></div>
+            <div><dt>Size</dt><dd>96 MB</dd></div>
+            <div><dt>Requires</dt><dd>Windows 10 / 11, 64-bit</dd></div>
+            <div><dt>Price</dt><dd>Free</dd></div>
+          </dl>
+          <a class="small-link" href="https://github.com/ss4a/video-downloader/releases">All releases &amp; release notes →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ ----------------------------------------------------------------->
+    <section class="section wrap faq" id="faq">
+      <h2 class="section-title">Questions</h2>
+      <details>
+        <summary>Is it really free?</summary>
+        <p>Yes. There are no ads, no trial and no paid tier. The source code is public on GitHub.</p>
+      </details>
+      <details>
+        <summary>Which sites does it work with?</summary>
+        <p>YouTube, Vimeo, and <a href="https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md">hundreds more</a>, through yt-dlp. Private, members-only, paywalled, or DRM-protected videos can't be downloaded.</p>
+      </details>
+      <details>
+        <summary>Where are my videos saved?</summary>
+        <p>In <code>Downloads\Video Downloader</code>. When a download finishes, click <strong>Show in folder</strong> to jump there.</p>
+      </details>
+      <details>
+        <summary>What's the portable version?</summary>
+        <p>A single .exe that runs without installing. It's handy on a USB stick or a PC where you can't install software, and it takes a few extra seconds to start.</p>
+      </details>
+      <details>
+        <summary>How do I uninstall it? Will I lose my videos?</summary>
+        <p>Go to <em>Settings → Apps → Installed apps → Video Downloader → Uninstall</em>. Your downloaded videos are never touched.</p>
+      </details>
+      <details>
+        <summary>Is there a Mac or Linux version?</summary>
+        <p>Not yet. It's Windows-only for now.</p>
+      </details>
+    </section>
+  </main>
+
+  <footer class="footer wrap">
+    <p class="responsible">Only download videos you have the right to save, and respect creators and each platform's terms. Video Downloader doesn't bypass DRM, paywalls or access restrictions.</p>
+    <div class="footer-row">
+      <span>Video Downloader · built on <a href="https://github.com/yt-dlp/yt-dlp">yt-dlp</a> and <a href="https://ffmpeg.org">FFmpeg</a></span>
+      <span class="footer-links">
+        <a href="https://github.com/ss4a/video-downloader">Source</a>
+        <a href="https://github.com/ss4a/video-downloader/releases">Releases</a>
+        <a href="https://github.com/ss4a/video-downloader/blob/main/packaging/THIRD_PARTY_NOTICES.txt">Licenses</a>
+      </span>
+    </div>
+  </footer>
+
+  <script>
+    // Gentle note for visitors who aren't on Windows.
+    try {
+      var ua = navigator.userAgent || "";
+      if (!/Windows/i.test(ua)) document.getElementById("os-note").hidden = false;
+    } catch (e) {}
+  </script>
+</body>
+</html>
