@@ -1,0 +1,27 @@
+Video Downloader bundles the following third-party software.
+
+yt-dlp
+  https://github.com/yt-dlp/yt-dlp
+  License: The Unlicense (public domain)
+
+FFmpeg (ffmpeg.exe, ffprobe.exe and the av*/sw* DLLs in the "bin" folder)
+  Build: yt-dlp/FFmpeg-Builds, "win64-gpl-shared"
+         https://github.com/yt-dlp/FFmpeg-Builds
+  Source code: https://github.com/FFmpeg/FFmpeg  and the build scripts at the URL above
+  License: GNU General Public License v3 (see FFmpeg-LICENSE.txt)
+
+Deno (deno.exe in the "bin" folder) - JavaScript runtime used by yt-dlp for YouTube
+  https://github.com/denoland/deno
+  License: MIT
+
+Python and its standard library
+  https://www.python.org   License: PSF License Agreement
+
+Flask, Werkzeug, Jinja2, MarkupSafe, itsdangerous, click, blinker  - BSD-3-Clause
+waitress                                                           - ZPL 2.1
+pywebview, proxy_tools, bottle                                     - BSD-3-Clause / MIT
+pythonnet, clr_loader                                              - MIT
+requests, urllib3, certifi, idna, charset-normalizer, brotli,
+websockets, mutagen, pycryptodomex, yt-dlp-ejs                     - Apache-2.0 / MIT / BSD / MPL-2.0 / Unlicense
+
+Microsoft Edge WebView2 Runtime is used to display the app window and is provided by Windows.
