@@ -28,6 +28,22 @@
 
   <main class="stage">
 
+    <!-- Update banner ------------------------------------------------------ -->
+    <div class="update-banner" id="update-banner" role="status" hidden>
+      <div class="update-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0-4.5-4.5M12 15l4.5-4.5M5 21h14"/></svg>
+      </div>
+      <div class="update-text">
+        <strong id="update-title">A new version is available</strong>
+        <span id="update-sub"></span>
+        <div class="update-progress" id="update-progress" hidden><div id="update-fill"></div></div>
+      </div>
+      <div class="update-actions">
+        <button class="btn btn-sm btn-ghost" data-action="update-later" id="update-later">Later</button>
+        <button class="btn btn-sm btn-primary" data-action="update-now" id="update-now">Update</button>
+      </div>
+    </div>
+
     <!-- 1. HOME ------------------------------------------------------------ -->
     <section class="view" id="view-home" data-view="home">
       <div class="hero">
@@ -105,11 +121,39 @@
             <p class="mini-sub" id="cf-sub"></p>
           </div>
         </div>
-        <dl class="kv">
-          <div><dt>Quality</dt><dd id="cf-quality"></dd></div>
-          <div><dt>Format</dt><dd id="cf-format"></dd></div>
-          <div><dt>Save to</dt><dd id="cf-folder" class="mono"></dd></div>
-        </dl>
+        <div class="kv">
+          <div class="kv-row">
+            <span class="kv-label" id="lbl-type">Download as</span>
+            <div class="segmented" role="radiogroup" aria-labelledby="lbl-type">
+              <button type="button" role="radio" data-kind="video" aria-checked="true">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3z"/></svg>
+                Video
+              </button>
+              <button type="button" role="radio" data-kind="audio" aria-checked="false">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>
+                Audio (MP3)
+              </button>
+            </div>
+          </div>
+          <div class="kv-row">
+            <label class="kv-label" for="cf-quality">Quality</label>
+            <div class="select-wrap">
+              <select id="cf-quality"></select>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+          </div>
+          <div class="kv-row">
+            <span class="kv-label">Format</span>
+            <span class="kv-value" id="cf-format"></span>
+          </div>
+          <div class="kv-row">
+            <span class="kv-label">Save to</span>
+            <span class="kv-value folder-value">
+              <span id="cf-folder" class="mono" title=""></span>
+              <button type="button" class="link-btn" data-action="change-folder">Change</button>
+            </span>
+          </div>
+        </div>
         <p class="fineprint">Only download videos you have the right to save. Respect the creator and the platform's terms.</p>
         <div class="actions actions-inline">
           <button class="btn btn-ghost" data-action="cancel-confirm">Cancel</button>
@@ -147,6 +191,20 @@
           <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="dl-bar">
             <div class="progress-fill" id="dl-fill"></div>
           </div>
+          <div class="running-actions">
+            <button class="btn btn-ghost btn-sm" data-action="cancel-download" id="cancel-btn">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+              Cancel download
+            </button>
+          </div>
+        </div>
+
+        <div class="cancelled-panel">
+          <p class="cancelled-msg">The download was cancelled and the partial file removed.</p>
+          <div class="actions actions-inline">
+            <button class="btn btn-ghost" data-action="start-over">Start over</button>
+            <button class="btn btn-primary" data-action="retry">Download again</button>
+          </div>
         </div>
 
         <div class="done-panel">
@@ -171,6 +229,8 @@
     </section>
 
   </main>
+
+  <footer class="app-footer"><span id="app-version"></span></footer>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 

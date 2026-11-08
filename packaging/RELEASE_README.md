@@ -1,4 +1,4 @@
-# Video Downloader 1.0.0
+# Video Downloader 1.1.0
 
 Paste a video link, check the preview, confirm, and download. It runs on Windows 10 and 11 (64-bit), and everything it needs comes with it. You don't need to install Python, Node.js, yt-dlp or FFmpeg.
 
@@ -25,10 +25,18 @@ The installer always adds a Start Menu shortcut.
 
 1. Paste a link, for example from YouTube or Vimeo, and click **Fetch Video**.
 2. Check the preview: thumbnail, title, channel, duration, quality and size.
-3. Click **Continue**, then **Confirm & Download**. Nothing downloads until you confirm.
-4. Watch the progress bar. When the download finishes, click **Show in folder**.
+3. Click **Continue**. On the confirm screen:
+   - Choose **Video** (MP4) or **Audio (MP3)**.
+   - Pick a **Quality**. Each option shows its approximate file size, and the app remembers your choice.
+   - Optionally click **Change** to save somewhere other than the default folder.
+4. Click **Confirm & Download**. Nothing downloads until you confirm.
+5. Watch the progress bar. Click **Cancel download** to stop; the partial file is removed. When the download finishes, click **Show in folder**.
 
-Videos are saved to **`Downloads\Video Downloader`** as MP4 files at the best available quality.
+By default, files are saved to **`Downloads\Video Downloader`**. MP3s are 192 kbps, with the title, channel and cover art filled in.
+
+## Updates
+
+When a new version is released, the app shows a banner at the top. Click **Update**: it downloads the new version, installs it, and reopens itself in about a minute. The portable version opens the download page instead.
 
 Only download videos you have the right to save. The app does not get around DRM, paywalls, private videos or sign-in requirements.
 
@@ -43,5 +51,5 @@ Go to **Settings → Apps → Installed apps → Video Downloader → Uninstall*
 ## Troubleshooting
 
 - **Black or empty window:** the app needs the Microsoft Edge WebView2 Runtime. Windows 11 already has it, and the installer adds it to Windows 10 when it's missing. If it still can't load, the app opens in your web browser instead.
-- **A site stops working:** sites change often. Updated releases include a newer yt-dlp.
+- **A site stops working:** sites change often. Install the latest update, which includes a newer yt-dlp.
 - **Log file:** `%LOCALAPPDATA%\Video Downloader\app.log`

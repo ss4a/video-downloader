@@ -2,7 +2,7 @@
 ; Build:  ISCC.exe packaging\installer.iss   (after running PyInstaller)
 
 #define AppName      "Video Downloader"
-#define AppVersion   "1.0.0"
+#define AppVersion   "1.1.0"
 #define AppExe       "VideoDownloader.exe"
 #define AppPublisher "Video Downloader"
 
@@ -68,6 +68,8 @@ Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExe}"; WorkingDir: "{app
 
 [Run]
 Filename: "{app}\{#AppExe}"; Description: "Launch {#AppName}"; Flags: nowait postinstall skipifsilent
+; In-app updates run Setup silently with /RELAUNCH=1, so reopen the app afterwards.
+Filename: "{app}\{#AppExe}"; Flags: nowait runasoriginaluser; Check: ShouldRelaunch
 
 [UninstallDelete]
 ; Only the app's own log/cache. Downloaded videos (in Downloads\Video Downloader)
@@ -81,6 +83,11 @@ Type: dirifempty; Name: "{app}"
 // (If this fails, the app still works by opening in the default browser.)
 const
   WV2Key = 'SOFTWARE\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}';
+
+function ShouldRelaunch: Boolean;
+begin
+  Result := ExpandConstant('{param:relaunch|0}') = '1';
+end;
 
 function HasWebView2: Boolean;
 var v: String;
