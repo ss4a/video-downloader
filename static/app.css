@@ -322,3 +322,8 @@ h1 { font-size: clamp(30px, 5vw, 42px); line-height: 1.1; letter-spacing: -.03em
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
+
+/* ---------- Web version ---------- */
+a.btn { text-decoration: none; }
+a.btn-primary { color: var(--accent-ink); }
+.login-form { max-width: 420px; margin: 0 auto; }

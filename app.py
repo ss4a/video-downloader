@@ -13,12 +13,18 @@ The Flask backend exposes a small JSON API that the UI talks to:
     GET  /api/update                                      -> is a newer release available on GitHub?
     POST /api/update/install    GET /api/update/status    -> download + run the new installer
 
-The server only listens on 127.0.0.1 and rejects requests whose Host header is
-not localhost, so other websites / machines cannot drive it.
+    GET  /api/file/<id>                                   -> (web mode) send the finished file
+
+The desktop app only listens on 127.0.0.1 and rejects requests whose Host header
+is not localhost, so other websites / machines cannot drive it. Web mode
+(--web) listens on the network for use from a phone and requires a password
+(VD_PASSWORD), except in GitHub Codespaces, where the forwarded port is private.
 """
 
 from __future__ import annotations
 
+import hashlib
+import hmac
 import ipaddress
 import json
 import os
@@ -36,7 +42,7 @@ import uuid
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from flask import Flask, abort, jsonify, request, send_from_directory
+from flask import Flask, abort, jsonify, make_response, redirect, request, send_file, send_from_directory
 import yt_dlp
 from yt_dlp.utils import DownloadCancelled, DownloadError, ExtractorError
 
@@ -52,10 +58,18 @@ GITHUB_REPO = "ss4a/video-downloader"
 RELEASES_PAGE = f"https://github.com/{GITHUB_REPO}/releases/latest"
 SETUP_ASSET = "VideoDownloader_Setup.exe"
 
-HOST = "127.0.0.1"
-PORT = int(os.environ.get("VD_PORT", "0"))  # 0 = pick a free port at startup
+# Web mode (--web or VD_WEB=1) serves the UI to other devices, e.g. a phone.
+# Files are handed to the browser instead of staying in a folder, desktop-only
+# features are off, and access needs a password (or a private Codespaces port).
+WEB_MODE = "--web" in sys.argv or os.environ.get("VD_WEB") == "1"
+IN_CODESPACE = os.environ.get("CODESPACES") == "true"
+PASSWORD = os.environ.get("VD_PASSWORD", "")
+
+HOST = os.environ.get("VD_HOST") or ("0.0.0.0" if WEB_MODE else "127.0.0.1")
+PORT = int(os.environ.get("VD_PORT", "8080" if WEB_MODE else "0"))  # 0 = pick a free port
 DEFAULT_DOWNLOAD_DIR = Path(
-    os.environ.get("VD_DOWNLOAD_DIR", Path.home() / "Downloads" / APP_NAME)
+    os.environ.get("VD_DOWNLOAD_DIR",
+                   Path.home() / ("vd-downloads" if WEB_MODE else Path("Downloads") / APP_NAME))
 ).expanduser().resolve()
 DATA_DIR = Path(os.environ.get("VD_DATA_DIR")
                 or Path(os.environ.get("LOCALAPPDATA", Path.home())) / APP_NAME)
@@ -110,11 +124,47 @@ if FROZEN and sys.stderr is None:
 # Security helpers
 # --------------------------------------------------------------------------- #
 
+AUTH_COOKIE = "vd_auth"
+AUTH_MAX_AGE = 30 * 24 * 3600
+_login_fails: list[float] = []
+_login_lock = threading.Lock()
+# Pages and files a signed-out visitor may load (the login screen itself).
+PUBLIC_PATHS = {"/login", "/api/login", "/static/app.css", "/static/login.js"}
+
+
+def _auth_token() -> str:
+    return hmac.new(PASSWORD.encode("utf-8"), b"vd-auth-v1", hashlib.sha256).hexdigest()
+
+
+def _is_signed_in() -> bool:
+    if not PASSWORD:
+        return True  # Codespaces: GitHub's private port already limits access to you
+    return hmac.compare_digest(request.cookies.get(AUTH_COOKIE, ""), _auth_token())
+
+
 @app.before_request
-def _check_host():
-    # Defends against DNS-rebinding: only accept requests addressed to localhost.
-    if request.host not in (f"127.0.0.1:{PORT}", f"localhost:{PORT}"):
-        abort(403)
+def _check_access():
+    if not WEB_MODE:
+        # Defends against DNS-rebinding: only accept requests addressed to localhost.
+        if request.host not in (f"127.0.0.1:{PORT}", f"localhost:{PORT}"):
+            abort(403)
+        return None
+    if request.path in PUBLIC_PATHS or _is_signed_in():
+        return None
+    if request.path.startswith("/api/"):
+        return jsonify(error="Please sign in again.", login=True), 401
+    return redirect("/login")
+
+
+DESKTOP_ONLY = {"api_open", "api_settings_set", "api_choose_folder",
+                "api_update_install", "api_open_releases"}
+
+
+@app.before_request
+def _block_desktop_only():
+    if WEB_MODE and request.endpoint in DESKTOP_ONLY:
+        return jsonify(error="That only works in the desktop app."), 404
+    return None
 
 
 class UserError(Exception):
@@ -452,8 +502,22 @@ ACTIVE = ("queued", "downloading", "processing")
 def _cleanup_jobs():
     cutoff = time.time() - JOB_TTL_SECONDS
     with jobs_lock:
-        for jid in [j for j, v in jobs.items() if v.get("finished_at", time.time()) < cutoff]:
-            jobs.pop(jid, None)
+        expired = [jobs.pop(j) for j, v in list(jobs.items()) if v.get("finished_at", time.time()) < cutoff]
+    if WEB_MODE:
+        # The phone keeps its own copy; don't let the server's disk fill up.
+        for job in expired:
+            fp = job.get("filepath")
+            if fp and is_inside(Path(fp), Path(job["folder"])):
+                Path(fp).unlink(missing_ok=True)
+
+
+def _cleanup_loop():
+    while True:
+        time.sleep(300)
+        try:
+            _cleanup_jobs()
+        except Exception:  # noqa: BLE001
+            app.logger.exception("Cleanup failed")
 
 
 def _update(job_id: str, **fields):
@@ -728,12 +792,60 @@ def static_files(filename):
     return send_from_directory(STATIC_DIR, filename)  # safe_join blocks traversal
 
 
+@app.get("/login")
+def login_page():
+    if not PASSWORD or _is_signed_in():
+        return redirect("/")
+    return send_from_directory(STATIC_DIR, "login.html")
+
+
+@app.post("/api/login")
+def api_login():
+    if not PASSWORD:
+        return jsonify(ok=True)
+    body = json_body()
+    with _login_lock:
+        now = time.time()
+        _login_fails[:] = [t for t in _login_fails if now - t < 600]
+        if len(_login_fails) >= 10:
+            raise UserError("Too many wrong passwords. Try again in 10 minutes.", 429)
+    given = body.get("password")
+    if not isinstance(given, str) or not hmac.compare_digest(
+            given.encode("utf-8"), PASSWORD.encode("utf-8")):
+        with _login_lock:
+            _login_fails.append(time.time())
+        time.sleep(1)  # slow down guessing
+        raise UserError("Wrong password.", 401)
+    resp = make_response(jsonify(ok=True))
+    secure = request.is_secure or request.headers.get("X-Forwarded-Proto") == "https"
+    resp.set_cookie(AUTH_COOKIE, _auth_token(), max_age=AUTH_MAX_AGE, httponly=True,
+                    samesite="Strict", secure=secure)
+    return resp
+
+
+@app.get("/api/file/<job_id>")
+def api_file(job_id):
+    """Web mode: send the finished file to the browser (e.g. to the phone)."""
+    if not WEB_MODE:
+        abort(404)
+    with jobs_lock:
+        job = jobs.get(job_id)
+        filepath = job.get("filepath") if job else None
+        folder = Path(job["folder"]) if job else None
+    if not filepath:
+        raise UserError("That file isn't available any more. Download it again.", 404)
+    path = Path(filepath).resolve()
+    if not is_inside(path, folder) or not path.is_file():
+        raise UserError("That file isn't available any more. Download it again.", 404)
+    return send_file(path, as_attachment=True, download_name=path.name, conditional=True)
+
+
 @app.get("/api/health")
 def health():
     return jsonify(ok=True, version=APP_VERSION, ffmpeg=HAS_FFMPEG,
                    yt_dlp=yt_dlp.version.__version__, js_runtimes=sorted(JS_RUNTIMES),
-                   bundled=BIN_DIR.is_dir(), installed=IS_INSTALLED,
-                   download_dir=str(get_download_dir()))
+                   bundled=BIN_DIR.is_dir(), installed=IS_INSTALLED, web=WEB_MODE,
+                   download_dir=None if WEB_MODE else str(get_download_dir()))
 
 
 @app.post("/api/info")
@@ -846,6 +958,8 @@ def api_open(job_id):
 
 @app.get("/api/settings")
 def api_settings_get():
+    if WEB_MODE:
+        return jsonify(download_dir=None, default_download_dir=None)
     return jsonify(download_dir=str(get_download_dir()), default_download_dir=str(DEFAULT_DOWNLOAD_DIR))
 
 
@@ -894,6 +1008,8 @@ def api_choose_folder():
 
 @app.get("/api/update")
 def api_update():
+    if WEB_MODE:  # the web version updates with the code (git pull / new Codespace)
+        return jsonify(current=CURRENT_VERSION, available=False, can_install=False)
     data = check_for_update(force=request.args.get("force") == "1")
     return jsonify({k: v for k, v in data.items() if not k.startswith("_")})
 
@@ -955,6 +1071,40 @@ def _wait_until_up(timeout=15.0) -> bool:
     return False
 
 
+def _lan_ip() -> str | None:
+    import socket
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.connect(("192.0.2.1", 80))  # no packet is sent; just picks the LAN interface
+            return s.getsockname()[0]
+    except OSError:
+        return None
+
+
+def _main_web():
+    if not PASSWORD and not IN_CODESPACE:
+        sys.exit("\n  Web mode needs a password so others on your network can't use it.\n"
+                 "  Set one first, for example (PowerShell):\n"
+                 '    $env:VD_PASSWORD="choose-a-password"; python app.py --web\n')
+    get_download_dir().mkdir(parents=True, exist_ok=True)
+    threading.Thread(target=_cleanup_loop, daemon=True).start()
+
+    print(f"\n  {APP_NAME} {APP_VERSION} (web) is running on port {PORT}")
+    if IN_CODESPACE:
+        name = os.environ.get("CODESPACE_NAME", "")
+        domain = os.environ.get("GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN", "app.github.dev")
+        print(f"  Open it at https://{name}-{PORT}.{domain}/  (only you can, while signed in to GitHub)")
+    else:
+        ip = _lan_ip()
+        print(f"  On this computer: http://localhost:{PORT}/")
+        if ip:
+            print(f"  On your phone (same Wi-Fi): http://{ip}:{PORT}/")
+    print(f"  ffmpeg: {FFMPEG_PATH or 'NOT found (single-file formats only)'}")
+    print(f"  JS runtimes: {', '.join(JS_RUNTIMES) or 'none (some YouTube videos may fail)'}\n",
+          flush=True)
+    _serve()
+
+
 def main():
     """
     Modes:
@@ -962,8 +1112,12 @@ def main():
       --browser   run the server and open the default browser
       --server    run the server only (headless; used for testing)
       --dev       Flask debug server
+      --web       serve the UI to other devices (phone); see README
     """
     global PORT
+    if WEB_MODE:
+        _main_web()
+        return
     if PORT == 0:
         PORT = _pick_port() if "--dev" not in sys.argv else 5000
     url = f"http://{HOST}:{PORT}"

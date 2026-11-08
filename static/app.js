@@ -71,6 +71,10 @@
     }
     let data = {};
     try { data = await res.json(); } catch { /* non-JSON */ }
+    if (res.status === 401 && data.login) {
+      window.location.href = "/login";
+      throw new Error("Please sign in again.");
+    }
     if (!res.ok) throw new Error(data.error || `Request failed (${res.status}).`);
     return data;
   }
@@ -386,6 +390,15 @@
       dlCard.dataset.state = "done";
       $("#dl-filename").textContent = job.filename || "";
       $("#dl-stats").textContent = fmtBytes(job.total_bytes) || "";
+      if (state.health?.web) {
+        // Web version: the file is on the server; hand it to this device.
+        $(".done-msg").firstChild.textContent = "Ready: ";
+        const a = $("#save-file-btn");
+        a.href = `/api/file/${jobId}`;
+        a.setAttribute("download", job.filename || "");
+        notifyDone(job.filename);
+        return;
+      }
       $(".done-msg").firstChild.textContent = job.already_existed ? "You already have this file: " : "Saved as ";
       if (job.already_existed) toast("You already downloaded this one");
       else notifyDone(job.filename);
@@ -566,6 +579,12 @@
   // ------------------------------------------------------------------ init
   api("/api/health").then((h) => {
     state.health = h;
+    if (h.web) {
+      document.documentElement.classList.add("web");
+      $("#cf-folder-row").hidden = true;
+      $("#open-folder-btn").hidden = true;
+      $("#save-file-btn").hidden = false;
+    }
     $("#app-version").textContent = h.version ? `Video Downloader ${h.version}` : "";
   }).catch(() => {});
   api("/api/settings").then((s) => { state.folder = s.download_dir; }).catch(() => {});
